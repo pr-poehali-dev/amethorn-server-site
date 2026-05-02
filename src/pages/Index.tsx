@@ -39,20 +39,33 @@ const DEFAULT_NEWS: NewsItem[] = [
 const DEFAULT_DONATE: DonateItem[] = [
   {
     id: 1,
-    name: "Аметист",
-    price: 199,
-    color: "from-purple-900/80 to-purple-800/50",
+    name: "Искра",
+    price: 49,
+    color: "from-purple-950/80 to-purple-900/50",
     features: [
-      "Префикс [Аметист] в чате",
-      "Доступ к /fly в мирном режиме",
-      "5 слотов в /sethome",
+      "Префикс [Искра] в чате",
+      "3 слота в /sethome",
       "Цветной ник",
+      "Доступ к /kit starter",
     ],
   },
   {
     id: 2,
+    name: "Аметист",
+    price: 99,
+    color: "from-purple-900/80 to-purple-800/50",
+    features: [
+      "Всё из «Искра»",
+      "Префикс [Аметист] в чате",
+      "Доступ к /fly в мирном режиме",
+      "5 слотов в /sethome",
+      "Уникальный плащ",
+    ],
+  },
+  {
+    id: 3,
     name: "Аметрин",
-    price: 499,
+    price: 199,
     color: "from-purple-800/80 to-violet-700/50",
     popular: true,
     features: [
@@ -65,17 +78,43 @@ const DEFAULT_DONATE: DonateItem[] = [
     ],
   },
   {
-    id: 3,
-    name: "Аметрит",
-    price: 999,
-    color: "from-violet-700/80 to-purple-600/50",
+    id: 4,
+    name: "Кристалл",
+    price: 349,
+    color: "from-violet-800/80 to-violet-700/50",
     features: [
       "Всё из «Аметрин»",
+      "Префикс [Кристалл]",
+      "Эффекты частиц вокруг игрока",
+      "25 слотов в /sethome",
+      "Доступ к закрытым ивентам",
+    ],
+  },
+  {
+    id: 5,
+    name: "Аметрит",
+    price: 499,
+    color: "from-violet-700/80 to-purple-600/50",
+    features: [
+      "Всё из «Кристалл»",
       "Префикс [Аметрит] в чате",
       "Безлимитные /sethome",
-      "Эксклюзивные эффекты частиц",
       "Доступ к VIP-миру",
       "Личная табличка в холле",
+    ],
+  },
+  {
+    id: 6,
+    name: "Легенда",
+    price: 799,
+    color: "from-fuchsia-900/80 to-purple-700/50",
+    features: [
+      "Всё из «Аметрит»",
+      "Префикс [Легенда] золотом",
+      "Уникальный ник-эффект",
+      "Личный варп для друзей",
+      "Приоритетная поддержка",
+      "Эксклюзивный питомец",
     ],
   },
 ];
@@ -464,7 +503,7 @@ const DonatePage = ({ items }: { items: DonateItem[] }) => {
       </div>
 
       {/* Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
         {items.map((item) => (
           <div key={item.id} className="relative group">
             {item.popular && (
