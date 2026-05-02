@@ -543,9 +543,14 @@ const DonatePage = ({ items }: { items: DonateItem[] }) => {
                 </ul>
               </div>
 
-              <button className="w-full py-2.5 bg-purple-700/60 hover:bg-purple-600 border border-purple-600/50 hover:border-purple-400 text-white font-minecraft text-sm rounded pixel-border transition-all hover:scale-[1.02] active:scale-[0.98]">
+              <a
+                href={`https://www.donationalerts.com/r/amethorn?amount=${item.price}&message=Привилегия+${encodeURIComponent(item.name)}+на+сервере+Amethorn`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block w-full py-2.5 bg-purple-700/60 hover:bg-purple-600 border border-purple-600/50 hover:border-purple-400 text-white font-minecraft text-sm rounded pixel-border transition-all hover:scale-[1.02] active:scale-[0.98] text-center"
+              >
                 КУПИТЬ
-              </button>
+              </a>
             </div>
           </div>
         ))}
