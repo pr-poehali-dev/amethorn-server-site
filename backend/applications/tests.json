@@ -1,0 +1,23 @@
+{
+  "tests": [
+    {
+      "name": "OPTIONS preflight",
+      "method": "OPTIONS",
+      "path": "/",
+      "expectedStatus": 200
+    },
+    {
+      "name": "Get applications with admin token",
+      "method": "GET",
+      "path": "/",
+      "headers": {"X-Admin-Token": "amethorn2026"},
+      "expectedStatus": 200
+    },
+    {
+      "name": "Forbidden without token",
+      "method": "GET",
+      "path": "/",
+      "expectedStatus": 403
+    }
+  ]
+}

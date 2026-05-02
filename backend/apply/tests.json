@@ -1,0 +1,24 @@
+{
+  "tests": [
+    {
+      "name": "OPTIONS preflight",
+      "method": "OPTIONS",
+      "path": "/",
+      "expectedStatus": 200
+    },
+    {
+      "name": "Duplicate nick check",
+      "method": "POST",
+      "path": "/",
+      "body": {"minecraft_nick": "TestPlayer99", "age": 18, "about": "Хочу играть на вашем сервере, люблю строить и исследовать миры"},
+      "expectedStatus": 409
+    },
+    {
+      "name": "Missing fields",
+      "method": "POST",
+      "path": "/",
+      "body": {"minecraft_nick": "ab"},
+      "expectedStatus": 400
+    }
+  ]
+}

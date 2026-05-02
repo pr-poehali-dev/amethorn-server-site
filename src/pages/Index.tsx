@@ -1,8 +1,26 @@
 import { useState, useEffect } from "react";
 import Icon from "@/components/ui/icon";
 
+// ====== API URLs ======
+const API = {
+  apply: "https://functions.poehali.dev/f2a5ec39-4570-41f9-9160-a041bf879731",
+  applications: "https://functions.poehali.dev/2225609b-bbe5-46b4-ba7a-a90d0466acc3",
+  reviewApplication: "https://functions.poehali.dev/aa694c5d-a674-499b-9363-e2942fbae413",
+};
+
 // ====== ТИПЫ ======
-type Page = "home" | "donate" | "connect" | "admin";
+type Page = "home" | "donate" | "connect" | "apply" | "admin";
+
+interface Application {
+  id: number;
+  minecraft_nick: string;
+  age: number;
+  about: string;
+  status: "pending" | "approved" | "rejected";
+  created_at: string;
+  reviewed_at: string | null;
+  reject_reason: string | null;
+}
 
 interface NewsItem {
   id: number;
@@ -155,7 +173,8 @@ const Nav = ({
   const links: { id: Page; label: string; icon: string }[] = [
     { id: "home", label: "Главная", icon: "Home" },
     { id: "donate", label: "Донат", icon: "Star" },
-    { id: "connect", label: "Играть", icon: "Gamepad2" },
+    { id: "connect", label: "Как играть", icon: "Gamepad2" },
+    { id: "apply", label: "Вступить", icon: "UserPlus" },
   ];
 
   return (
@@ -194,10 +213,10 @@ const Nav = ({
         {/* CTA */}
         <div className="hidden md:flex items-center gap-3">
           <button
-            onClick={() => setPage("connect")}
+            onClick={() => setPage("apply")}
             className="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white text-sm font-minecraft rounded pixel-border transition-all hover:scale-105 active:scale-95"
           >
-            ИГРАТЬ
+            ВСТУПИТЬ
           </button>
         </div>
 
@@ -326,16 +345,16 @@ const HomePage = ({
             style={{ animationDelay: "0.55s", animationFillMode: "forwards" }}
           >
             <button
-              onClick={() => setPage("connect")}
+              onClick={() => setPage("apply")}
               className="px-8 py-3.5 bg-purple-600 hover:bg-purple-500 text-white font-minecraft rounded pixel-border-bright transition-all hover:scale-105 active:scale-95 text-sm"
             >
-              НАЧАТЬ ИГРАТЬ
+              ВСТУПИТЬ НА СЕРВЕР
             </button>
             <button
-              onClick={() => setPage("donate")}
+              onClick={() => setPage("connect")}
               className="px-8 py-3.5 bg-black/50 hover:bg-purple-950/70 border border-purple-700/60 hover:border-purple-500 text-purple-300 hover:text-white font-minecraft rounded pixel-border transition-all hover:scale-105 text-sm"
             >
-              ПРИВИЛЕГИИ
+              КАК ИГРАТЬ
             </button>
           </div>
 
@@ -593,6 +612,145 @@ const DonatePage = ({ items }: { items: DonateItem[] }) => {
   );
 };
 
+// ====== СТРАНИЦА ЗАЯВКИ ======
+const ApplyPage = ({ setPage }: { setPage: (p: Page) => void }) => {
+  const [nick, setNick] = useState("");
+  const [age, setAge] = useState("");
+  const [about, setAbout] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+    try {
+      const res = await fetch(API.apply, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ minecraft_nick: nick, age: parseInt(age), about }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setSuccess(true);
+      } else {
+        setError(data.error || "Ошибка при отправке");
+      }
+    } catch {
+      setError("Ошибка соединения. Попробуй позже.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (success) {
+    return (
+      <div className="pt-24 pb-16 px-4 max-w-lg mx-auto flex flex-col items-center justify-center min-h-[70vh] text-center">
+        <div className="w-16 h-16 bg-green-900/40 border border-green-700/50 rounded pixel-border flex items-center justify-center mb-6">
+          <Icon name="CheckCircle" size={32} className="text-green-400" />
+        </div>
+        <h1 className="font-minecraft text-2xl text-white mb-3">ЗАЯВКА ОТПРАВЛЕНА!</h1>
+        <p className="font-body text-gray-400 mb-6">
+          Ожидай решения администраторов. Обычно это занимает не больше суток. Если хочешь уточнить — напиши в Discord.
+        </p>
+        <a
+          href="https://discord.gg/xsbR4p5M7g"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-2 px-5 py-2.5 bg-[#5865F2]/20 border border-[#5865F2]/40 hover:bg-[#5865F2]/30 text-[#a5b4fc] rounded font-body text-sm transition-all"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057c.002.022.015.043.033.055a19.912 19.912 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
+          Наш Discord
+        </a>
+      </div>
+    );
+  }
+
+  return (
+    <div className="pt-24 pb-16 px-4 max-w-xl mx-auto">
+      <div className="text-center mb-10">
+        <span className="inline-block px-3 py-1 bg-purple-900/60 border border-purple-700/50 text-purple-300 text-xs font-minecraft rounded mb-4">
+          ВСТУПЛЕНИЕ НА СЕРВЕР
+        </span>
+        <h1 className="font-minecraft text-3xl md:text-4xl text-white amethyst-glow mb-3">
+          ЗАЯВКА
+        </h1>
+        <p className="font-body text-gray-400 text-sm">
+          Заполни форму — администраторы рассмотрят заявку и добавят тебя в whitelist
+        </p>
+      </div>
+
+      <form onSubmit={handleSubmit} className="bg-card border border-purple-900/40 rounded p-6 pixel-border space-y-5">
+        <div>
+          <label className="block font-minecraft text-purple-300 text-xs mb-2">НИК В MINECRAFT</label>
+          <input
+            value={nick}
+            onChange={(e) => setNick(e.target.value)}
+            placeholder="Твой точный ник (3–16 символов)"
+            maxLength={16}
+            required
+            className="w-full bg-muted border border-purple-900/40 focus:border-purple-600 rounded px-3 py-2.5 text-white text-sm font-body focus:outline-none placeholder:text-gray-600 transition-colors"
+          />
+        </div>
+
+        <div>
+          <label className="block font-minecraft text-purple-300 text-xs mb-2">ВОЗРАСТ</label>
+          <input
+            value={age}
+            onChange={(e) => setAge(e.target.value)}
+            type="number"
+            placeholder="Сколько тебе лет?"
+            min={8}
+            max={99}
+            required
+            className="w-full bg-muted border border-purple-900/40 focus:border-purple-600 rounded px-3 py-2.5 text-white text-sm font-body focus:outline-none placeholder:text-gray-600 transition-colors"
+          />
+        </div>
+
+        <div>
+          <label className="block font-minecraft text-purple-300 text-xs mb-2">О СЕБЕ</label>
+          <textarea
+            value={about}
+            onChange={(e) => setAbout(e.target.value)}
+            placeholder="Расскажи немного о себе: как играешь, что любишь строить, откуда узнал о сервере..."
+            rows={5}
+            minLength={20}
+            required
+            className="w-full bg-muted border border-purple-900/40 focus:border-purple-600 rounded px-3 py-2.5 text-white text-sm font-body focus:outline-none placeholder:text-gray-600 resize-none transition-colors"
+          />
+          <p className="text-gray-600 text-xs font-body mt-1">{about.length} / минимум 20 символов</p>
+        </div>
+
+        {error && (
+          <div className="flex items-center gap-2 p-3 bg-red-950/40 border border-red-800/50 rounded text-red-400 text-sm font-body">
+            <Icon name="AlertCircle" size={14} className="shrink-0" />
+            {error}
+          </div>
+        )}
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full py-3 bg-purple-700 hover:bg-purple-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-minecraft text-sm rounded pixel-border transition-all hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2"
+        >
+          {loading ? (
+            <>
+              <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              ОТПРАВКА...
+            </>
+          ) : (
+            <>
+              <Icon name="Send" size={14} />
+              ОТПРАВИТЬ ЗАЯВКУ
+            </>
+          )}
+        </button>
+      </form>
+    </div>
+  );
+};
+
 // ====== СТРАНИЦА ПОДКЛЮЧЕНИЯ ======
 const ConnectPage = () => {
   const [copied, setCopied] = useState(false);
@@ -752,11 +910,67 @@ const AdminPage = ({
   serverIp: string;
   setServerIp: (ip: string) => void;
 }) => {
-  const [tab, setTab] = useState<"news" | "donate" | "settings">("news");
+  const [tab, setTab] = useState<"applications" | "news" | "donate" | "settings">("applications");
   const [newTitle, setNewTitle] = useState("");
   const [newText, setNewText] = useState("");
   const [editNews, setEditNews] = useState<NewsItem | null>(null);
   const [editDonate, setEditDonate] = useState<DonateItem | null>(null);
+  const [applications, setApplications] = useState<Application[]>([]);
+  const [appsLoading, setAppsLoading] = useState(false);
+  const [appsFilter, setAppsFilter] = useState<"all" | "pending" | "approved" | "rejected">("pending");
+  const [rejectId, setRejectId] = useState<number | null>(null);
+  const [rejectReason, setRejectReason] = useState("");
+  const [actionLoading, setActionLoading] = useState<number | null>(null);
+
+  const loadApplications = async () => {
+    setAppsLoading(true);
+    try {
+      const res = await fetch(`${API.applications}?status=${appsFilter}`, {
+        headers: { "X-Admin-Token": "amethorn2026" },
+      });
+      const data = await res.json();
+      setApplications(data.applications || []);
+    } catch {
+      // ignore
+    } finally {
+      setAppsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (tab === "applications") loadApplications();
+  }, [tab, appsFilter]);
+
+  const handleApprove = async (id: number) => {
+    setActionLoading(id);
+    try {
+      await fetch(API.reviewApplication, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-Admin-Token": "amethorn2026" },
+        body: JSON.stringify({ id, action: "approve" }),
+      });
+      loadApplications();
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleReject = async (id: number) => {
+    if (!rejectReason.trim()) return;
+    setActionLoading(id);
+    try {
+      await fetch(API.reviewApplication, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-Admin-Token": "amethorn2026" },
+        body: JSON.stringify({ id, action: "reject", reject_reason: rejectReason }),
+      });
+      setRejectId(null);
+      setRejectReason("");
+      loadApplications();
+    } finally {
+      setActionLoading(null);
+    }
+  };
 
   const addNews = () => {
     if (!newTitle.trim() || !newText.trim()) return;
@@ -792,9 +1006,10 @@ const AdminPage = ({
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-2 mb-8">
+      <div className="flex flex-wrap gap-2 mb-8">
         {(
           [
+            { id: "applications", label: "Заявки", icon: "UserCheck" },
             { id: "news", label: "Новости", icon: "Newspaper" },
             { id: "donate", label: "Донат", icon: "Star" },
             { id: "settings", label: "Настройки", icon: "Settings2" },
@@ -814,6 +1029,123 @@ const AdminPage = ({
           </button>
         ))}
       </div>
+
+      {/* APPLICATIONS TAB */}
+      {tab === "applications" && (
+        <div className="space-y-4">
+          {/* Filter */}
+          <div className="flex gap-2 flex-wrap">
+            {(["pending", "approved", "rejected", "all"] as const).map((f) => (
+              <button
+                key={f}
+                onClick={() => setAppsFilter(f)}
+                className={`px-3 py-1.5 rounded font-minecraft text-xs transition-all ${
+                  appsFilter === f
+                    ? "bg-purple-700 text-white"
+                    : "bg-muted text-gray-400 hover:text-white"
+                }`}
+              >
+                {f === "pending" ? "Ожидают" : f === "approved" ? "Одобрены" : f === "rejected" ? "Отклонены" : "Все"}
+              </button>
+            ))}
+            <button
+              onClick={loadApplications}
+              className="ml-auto px-3 py-1.5 bg-muted text-gray-400 hover:text-white rounded font-minecraft text-xs flex items-center gap-1 transition-all"
+            >
+              <Icon name="RefreshCw" size={12} />
+              ОБНОВИТЬ
+            </button>
+          </div>
+
+          {appsLoading ? (
+            <div className="text-center py-12 text-gray-500 font-body text-sm">Загрузка...</div>
+          ) : applications.length === 0 ? (
+            <div className="text-center py-12 bg-card border border-purple-900/40 rounded pixel-border">
+              <Icon name="Inbox" size={32} className="text-gray-700 mx-auto mb-2" />
+              <p className="text-gray-500 font-body text-sm">Заявок нет</p>
+            </div>
+          ) : (
+            applications.map((app) => (
+              <div key={app.id} className="bg-card border border-purple-900/40 rounded p-5 pixel-border">
+                <div className="flex items-start justify-between gap-4 mb-3">
+                  <div>
+                    <div className="flex items-center gap-3 flex-wrap">
+                      <span className="font-minecraft text-white text-lg">{app.minecraft_nick}</span>
+                      <span className="font-body text-gray-500 text-xs">{app.age} лет</span>
+                      <span className={`px-2 py-0.5 rounded text-xs font-minecraft ${
+                        app.status === "pending" ? "bg-yellow-900/40 text-yellow-400 border border-yellow-800/50" :
+                        app.status === "approved" ? "bg-green-900/40 text-green-400 border border-green-800/50" :
+                        "bg-red-900/40 text-red-400 border border-red-800/50"
+                      }`}>
+                        {app.status === "pending" ? "ОЖИДАЕТ" : app.status === "approved" ? "ОДОБРЕН" : "ОТКЛОНЁН"}
+                      </span>
+                    </div>
+                    <p className="text-gray-500 text-xs font-body mt-0.5">Подана: {app.created_at}</p>
+                  </div>
+                </div>
+
+                <div className="bg-muted/50 rounded p-3 mb-4">
+                  <p className="font-body text-gray-300 text-sm leading-relaxed">{app.about}</p>
+                </div>
+
+                {app.status === "rejected" && app.reject_reason && (
+                  <div className="bg-red-950/30 border border-red-900/40 rounded p-3 mb-4">
+                    <p className="font-body text-red-400 text-xs">Причина: {app.reject_reason}</p>
+                  </div>
+                )}
+
+                {app.status === "pending" && (
+                  <div className="space-y-3">
+                    {rejectId === app.id ? (
+                      <div className="space-y-2">
+                        <input
+                          value={rejectReason}
+                          onChange={(e) => setRejectReason(e.target.value)}
+                          placeholder="Причина отклонения"
+                          className="w-full bg-muted border border-red-900/40 focus:border-red-600 rounded px-3 py-2 text-white text-sm font-body focus:outline-none placeholder:text-gray-600"
+                        />
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => handleReject(app.id)}
+                            disabled={!rejectReason.trim() || actionLoading === app.id}
+                            className="px-4 py-1.5 bg-red-800/60 hover:bg-red-700 disabled:opacity-40 text-white font-minecraft text-xs rounded pixel-border transition-all"
+                          >
+                            ОТКЛОНИТЬ
+                          </button>
+                          <button
+                            onClick={() => { setRejectId(null); setRejectReason(""); }}
+                            className="px-4 py-1.5 bg-muted text-gray-400 font-minecraft text-xs rounded transition-all"
+                          >
+                            ОТМЕНА
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => handleApprove(app.id)}
+                          disabled={actionLoading === app.id}
+                          className="flex items-center gap-1.5 px-4 py-1.5 bg-green-800/60 hover:bg-green-700 disabled:opacity-40 text-white font-minecraft text-xs rounded pixel-border transition-all"
+                        >
+                          <Icon name="Check" size={12} />
+                          {actionLoading === app.id ? "..." : "ОДОБРИТЬ"}
+                        </button>
+                        <button
+                          onClick={() => setRejectId(app.id)}
+                          className="flex items-center gap-1.5 px-4 py-1.5 bg-red-900/40 hover:bg-red-800/60 text-red-400 hover:text-white font-minecraft text-xs rounded pixel-border transition-all"
+                        >
+                          <Icon name="X" size={12} />
+                          ОТКЛОНИТЬ
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            ))
+          )}
+        </div>
+      )}
 
       {/* NEWS TAB */}
       {tab === "news" && (
@@ -1174,6 +1506,7 @@ const Index = () => {
         {page === "home" && <HomePage news={news} setPage={setPage} />}
         {page === "donate" && <DonatePage items={donateItems} />}
         {page === "connect" && <ConnectPage />}
+        {page === "apply" && <ApplyPage setPage={setPage} />}
         {page === "admin" && isAdmin && (
           <AdminPage
             news={news}

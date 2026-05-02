@@ -1,0 +1,25 @@
+{
+  "tests": [
+    {
+      "name": "OPTIONS preflight",
+      "method": "OPTIONS",
+      "path": "/",
+      "expectedStatus": 200
+    },
+    {
+      "name": "Forbidden without token",
+      "method": "POST",
+      "path": "/",
+      "body": {"id": 1, "action": "approve"},
+      "expectedStatus": 403
+    },
+    {
+      "name": "Not found application",
+      "method": "POST",
+      "path": "/",
+      "headers": {"X-Admin-Token": "amethorn2026"},
+      "body": {"id": 999999, "action": "reject", "reject_reason": "Не подходишь"},
+      "expectedStatus": 404
+    }
+  ]
+}
