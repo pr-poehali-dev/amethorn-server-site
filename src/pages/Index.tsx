@@ -214,7 +214,7 @@ const Footer = () => (
       </div>
 
       <a
-        href="https://discord.gg/amethorn"
+        href="https://discord.gg/xsbR4p5M7g"
         target="_blank"
         rel="noopener noreferrer"
         className="flex items-center gap-2 px-4 py-2 bg-[#5865F2]/20 border border-[#5865F2]/40 hover:bg-[#5865F2]/30 text-[#a5b4fc] rounded transition-all group"
