@@ -556,13 +556,37 @@ const DonatePage = ({ items }: { items: DonateItem[] }) => {
         ))}
       </div>
 
-      {/* Info */}
-      <div className="bg-card border border-purple-900/40 rounded p-6 pixel-border max-w-2xl mx-auto text-center">
-        <Icon name="Info" size={20} className="text-purple-400 mx-auto mb-2" />
-        <p className="font-body text-gray-400 text-sm">
-          После оплаты привилегия активируется в течение 5-15 минут. По всем
-          вопросам обращайтесь в Discord сервер.
-        </p>
+      {/* How to buy */}
+      <div className="bg-card border border-purple-700/40 rounded pixel-border max-w-2xl mx-auto overflow-hidden">
+        <div className="bg-purple-900/30 px-6 py-3 border-b border-purple-800/40 flex items-center gap-2">
+          <Icon name="ClipboardList" size={16} className="text-purple-400" />
+          <span className="font-minecraft text-white text-sm">КАК ОФОРМИТЬ ПОКУПКУ</span>
+        </div>
+        <div className="p-6 space-y-4">
+          {[
+            { num: "1", text: "Нажми «Купить» — откроется страница DonationAlerts с нужной суммой" },
+            { num: "2", text: <>В поле <span className="text-purple-300 font-minecraft text-xs">«Сообщение»</span> напиши свой ник в Minecraft</> },
+            { num: "3", text: "Оплати удобным способом" },
+            { num: "4", text: "Привилегия будет выдана в течение 5–15 минут после получения оплаты" },
+          ].map((step) => (
+            <div key={step.num} className="flex items-start gap-4">
+              <span className="shrink-0 w-7 h-7 bg-purple-800/60 border border-purple-700/50 text-purple-300 font-minecraft text-xs flex items-center justify-center rounded-sm">
+                {step.num}
+              </span>
+              <p className="font-body text-gray-300 text-sm leading-relaxed pt-0.5">{step.text}</p>
+            </div>
+          ))}
+          <div className="mt-2 pt-4 border-t border-purple-900/40 flex items-start gap-2">
+            <Icon name="MessageCircle" size={15} className="text-purple-500 shrink-0 mt-0.5" />
+            <p className="font-body text-gray-500 text-xs">
+              Если привилегия не выдана дольше 15 минут — напиши в{" "}
+              <a href="https://discord.gg/xsbR4p5M7g" target="_blank" rel="noopener noreferrer" className="text-purple-400 hover:text-purple-300 underline">
+                Discord
+              </a>{" "}
+              и приложи скриншот оплаты.
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   );
